@@ -1,0 +1,7 @@
+AccessModifierOffset: 0
+AllowShortFunctionsOnASingleLine: None
+AllowShortLambdasOnASingleLine: None
+BreakTemplateDeclarations: Yes
+IndentCaseLabels: true
+IndentWidth: 4
+AlignAfterOpenBracket: BlockIndent
