@@ -1,10 +1,14 @@
 #include "tree.h"
+#include "bit_buffer.h"
 #include "cpr_core.h"
 
+#include <fstream>
 #include <map>
 #include <memory>
 #include <queue>
 #include <stdexcept>
+#include <string>
+#include <sys/types.h>
 
 namespace CPR {
 
@@ -103,6 +107,47 @@ CodeBook Tree::get_codes() {
     this->_gen_code(this->p_head, empty, cb);
 
     return cb;
+}
+
+BitBuffer Tree::encode(std::string text) {
+    BitBuffer temp_buf{};
+
+    // Get encoding data
+    auto cb = this->get_codes();
+
+    // Encode the input text in a temporary buffer
+    for (auto c : text) {
+        temp_buf.write_bits(cb[c].data());
+    }
+
+    BitBuffer buf{};
+
+    auto size = temp_buf.size();
+
+    // Encode the byte size into the final buffer
+    for (int i = 31; i >= 0; i--) {
+        buf.write_bit((size >> i) & 1);
+    }
+
+    // Add in the encoded data
+    buf.write_bits(temp_buf.read_bits());
+
+    return buf;
+}
+
+void Tree::write_encode(std::string filename, std::string text) {
+    std::ofstream out(filename, std::ios::binary);
+
+    if (!out)
+        throw std::runtime_error("Unable to open file for writing");
+
+    BitBuffer buf = this->encode(text);
+
+    std::vector<uint8_t> data = buf.data();
+
+    out.write(reinterpret_cast<const char *>(data.data()), data.size());
+
+    out.close();
 }
 
 } // namespace CPR

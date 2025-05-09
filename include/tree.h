@@ -1,10 +1,12 @@
 #ifndef CPR_TREE
 #define CPR_TREE
 
+#include "bit_buffer.h"
 #include "cpr_core.h"
 
 #include <memory>
 #include <optional>
+#include <string>
 
 namespace CPR {
 
@@ -53,11 +55,17 @@ class TreeNode {
 
 class Tree {
     public:
-    /// @brief Factory Constructor
-    /// @param freq_map A map that models a given char's probability
+    //! @brief Factory Constructor
+    //! @param freq_map A map that models a given char's probability
     static Tree new_tree(FreqTable freq_map);
-    /// @brief Generate the final map of character encodings
+    //! @brief Generate the final map of character encodings
     CodeBook get_codes();
+    //! @brief Encode the string to a buffer
+    //! @param text The text to encode
+    BitBuffer encode(std::string text);
+    //! @brief Encode the string to a file
+    //! @param text The text to encode
+    void write_encode(std::string filename, std::string text);
 
     protected:
     std::shared_ptr<TreeNode> p_head;

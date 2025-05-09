@@ -7,7 +7,7 @@
 
 namespace CPR {
 
-Code Code::with(bool next_bit) {
+Code Code::with(bool next_bit) const {
     std::vector<bool> copy(this->_code);
 
     copy.push_back(next_bit);
@@ -15,7 +15,7 @@ Code Code::with(bool next_bit) {
     return CPR::Code(copy);
 }
 
-std::string Code::repr() {
+std::string Code::repr() const {
     std::string s;
 
     for (auto bit : this->_code) {
@@ -23,6 +23,10 @@ std::string Code::repr() {
     }
 
     return s;
+}
+
+std::vector<bool> Code::data() const {
+    return this->_code;
 }
 
 std::ostream &operator<<(std::ostream &os, const Code &cd) {
