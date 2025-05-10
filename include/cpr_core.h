@@ -12,6 +12,7 @@ typedef std::map<char, unsigned long long> FreqTable;
 typedef std::pair<char, unsigned long long> Freq;
 typedef std::map<char, Code> CodeBook;
 typedef std::pair<char, Code> Encoding;
+typedef std::map<char, size_t> LengthBook;
 
 /**
  * @brief Gets a frequency map of all characters in a file
@@ -47,6 +48,16 @@ void merge_freq(FreqTable &table, const FreqTable &other);
  * @param cb The encoding map, or codebook
  */
 void print_codes(CodeBook cb);
+
+/**
+ * @brief Generate a Codebook from byte, length encoding
+ *
+ * @param lengths Map of code lengths for each bit
+ *
+ * @return A CodeBook
+ */
+CodeBook cb_from_lengths(LengthBook lengths);
+
 } // namespace CPR
 
 #endif

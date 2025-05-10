@@ -1,6 +1,7 @@
 #include "cpr_core.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -119,6 +120,40 @@ void print_codes(CodeBook cb) {
         }
         std::cout << std::setw(4) << key << " | " << pair.second << std::endl;
     }
+}
+
+CodeBook cb_from_lengths(LengthBook lengths) {
+    // Create cannonical sorting
+    std::vector<std::pair<char, size_t>> symbols(
+        lengths.begin(), lengths.end()
+    );
+    std::sort(symbols.begin(), symbols.end(), [](const auto &a, const auto &b) {
+        if (a.second == b.second)
+            return a.first < b.first;
+        return a.second < b.second;
+    });
+
+    // Construct codes
+    size_t prev_len = 0;
+    std::map<char, Code> result;
+
+    uint32_t code_value = 0;
+    for (const auto &[ch, len] : symbols) {
+        if (len > prev_len) {
+            code_value <<= (len - prev_len);
+            prev_len = len;
+        }
+
+        std::vector<bool> bits(len);
+        for (size_t i = 0; i < len; i++) {
+            bits[len - i - 1] = (code_value >> i) & 1;
+        }
+
+        Code code(bits);
+        result[ch] = code;
+    }
+
+    return result;
 }
 
 } // namespace CPR

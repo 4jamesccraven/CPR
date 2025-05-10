@@ -17,15 +17,16 @@ class TreeNode {
     /// @param freq Its frequency
     TreeNode(char char_val, unsigned long long freq)
         : _character(std::optional<char>{char_val}), _frequency(freq),
-          p_left(nullptr), p_right(nullptr) {
-    }
+          p_left(nullptr), p_right(nullptr) {}
 
     /// @brief Constructor for Optional char
     /// @param val The optional char value
     /// @param freq Its frequency
+    /* clang-format off */
     TreeNode(std::optional<char> val, unsigned long long freq)
-        : _character(val), _frequency(freq), p_left(nullptr), p_right(nullptr) {
-    }
+        : _character(val), _frequency(freq),
+          p_left(nullptr), p_right(nullptr) { }
+    /* clang-format on */
 
     /// @brief Setter for the left child
     void set_left(std::shared_ptr<TreeNode> l);
@@ -58,22 +59,24 @@ class Tree {
     //! @brief Factory Constructor
     //! @param freq_map A map that models a given char's probability
     static Tree new_tree(FreqTable freq_map);
-    //! @brief Generate the final map of character encodings
-    CodeBook get_codes();
-    //! @brief Encode the string to a buffer
-    //! @param text The text to encode
-    BitBuffer encode(std::string text);
-    //! @brief Encode the string to a file
-    //! @param text The text to encode
-    void write_encode(std::string filename, std::string text);
+    //! @brief Generate the serialisable lengths
+    LengthBook get_codes();
+    // //! @brief Encode the string to a buffer
+    // //! @param text The text to encode
+    // BitBuffer encode(std::string text);
+    // //! @brief Encode the string to a file
+    // //! @param text The text to encode
+    // void write_encode(std::string filename, std::string text);
 
     protected:
     std::shared_ptr<TreeNode> p_head;
+    std::optional<LengthBook> _lb;
 
-    Tree(std::shared_ptr<TreeNode> head) : p_head(head) {
-    }
+    Tree(std::shared_ptr<TreeNode> head) : p_head(head), _cb({}) {}
 
-    void _gen_code(std::shared_ptr<TreeNode> root, Code code, CodeBook &cb);
+    /* clang-format off */
+    void _gen_code_no_cannon(std::shared_ptr<TreeNode> root, Code code, CodeBook &cb);
+    /* clang-format on */
 };
 
 } // namespace CPR

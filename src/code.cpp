@@ -29,6 +29,10 @@ std::vector<bool> Code::data() const {
     return this->_code;
 }
 
+size_t Code::size() const {
+    return this->_code.size();
+}
+
 std::ostream &operator<<(std::ostream &os, const Code &cd) {
     for (auto bit : cd._code) {
         os << (bit ? '1' : '0');

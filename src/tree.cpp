@@ -1,14 +1,14 @@
 #include "tree.h"
-#include "bit_buffer.h"
 #include "cpr_core.h"
 
-#include <fstream>
+#include <algorithm>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <queue>
 #include <stdexcept>
-#include <string>
 #include <sys/types.h>
+#include <utility>
 
 namespace CPR {
 
@@ -82,7 +82,9 @@ Tree Tree::new_tree(std::map<char, unsigned long long> freq_map) {
     return Tree(queue.top());
 }
 
-void Tree::_gen_code(std::shared_ptr<TreeNode> root, Code code, CodeBook &cb) {
+void Tree::_gen_code_no_cannon(
+    std::shared_ptr<TreeNode> root, Code code, CodeBook &cb
+) {
     // If this is null we've gone too far
     if (!root) {
         return;
@@ -95,59 +97,73 @@ void Tree::_gen_code(std::shared_ptr<TreeNode> root, Code code, CodeBook &cb) {
     }
 
     // Recurse to the left...
-    this->_gen_code(root->get_left(), code.with(0), cb);
+    this->_gen_code_no_cannon(root->get_left(), code.with(0), cb);
     // ...then the right
-    this->_gen_code(root->get_right(), code.with(1), cb);
+    this->_gen_code_no_cannon(root->get_right(), code.with(1), cb);
 }
 
-CodeBook Tree::get_codes() {
+LengthBook Tree::get_codes() {
+    // If we've calculated this before, return the result
+    if (this->_lb.has_value())
+        return this->_lb.value();
+
+    // Generate non-cannonical code lengths
     CodeBook cb;
     std::vector<bool> empty;
+    this->_gen_code_no_cannon(this->p_head, empty, cb);
 
-    this->_gen_code(this->p_head, empty, cb);
+    std::map<char, size_t> sizes;
+    std::transform(
+        cb.cbegin(), cb.cend(), std::inserter(sizes, sizes.end()),
+        [](auto &p) {
+            return std::make_pair(p.first, p.second.size());
+        }
+    );
 
-    return cb;
+    this->_lb = std::optional<LengthBook>(sizes);
+
+    return sizes;
 }
 
-BitBuffer Tree::encode(std::string text) {
-    BitBuffer temp_buf{};
-
-    // Get encoding data
-    auto cb = this->get_codes();
-
-    // Encode the input text in a temporary buffer
-    for (auto c : text) {
-        temp_buf.write_bits(cb[c].data());
-    }
-
-    BitBuffer buf{};
-
-    auto size = temp_buf.size();
-
-    // Encode the byte size into the final buffer
-    for (int i = 31; i >= 0; i--) {
-        buf.write_bit((size >> i) & 1);
-    }
-
-    // Add in the encoded data
-    buf.write_bits(temp_buf.read_bits());
-
-    return buf;
-}
-
-void Tree::write_encode(std::string filename, std::string text) {
-    std::ofstream out(filename, std::ios::binary);
-
-    if (!out)
-        throw std::runtime_error("Unable to open file for writing");
-
-    BitBuffer buf = this->encode(text);
-
-    std::vector<uint8_t> data = buf.data();
-
-    out.write(reinterpret_cast<const char *>(data.data()), data.size());
-
-    out.close();
-}
+// BitBuffer Tree::encode(std::string text) {
+//     BitBuffer temp_buf{};
+//
+//     // Get encoding data
+//     auto cb = this->get_codes();
+//
+//     // Encode the input text in a temporary buffer
+//     for (auto c : text) {
+//         temp_buf.write_bits(cb[c].data());
+//     }
+//
+//     BitBuffer buf{};
+//
+//     auto size = temp_buf.size();
+//
+//     // Encode the byte size into the final buffer
+//     for (int i = 31; i >= 0; i--) {
+//         buf.write_bit((size >> i) & 1);
+//     }
+//
+//     // Add in the encoded data
+//     buf.write_bits(temp_buf.read_bits());
+//
+//     return buf;
+// }
+//
+// void Tree::write_encode(std::string filename, std::string text) {
+//     std::ofstream out(filename, std::ios::binary);
+//
+//     if (!out)
+//         throw std::runtime_error("Unable to open file for writing");
+//
+//     BitBuffer buf = this->encode(text);
+//
+//     std::vector<uint8_t> data = buf.data();
+//
+//     out.write(reinterpret_cast<const char *>(data.data()), data.size());
+//
+//     out.close();
+// }
 
 } // namespace CPR

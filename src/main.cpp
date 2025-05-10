@@ -22,8 +22,8 @@ int main(int argc, char *argv[]) {
     app.add_option(
            "-o,--out", out_file, "Save the (de)compressed data to a file"
     )
-        ->option_text("FILE")
-        ->check(CLI::NonexistentPath);
+        ->option_text("FILE");
+    // ->check(CLI::NonexistentPath);
 
     bool encode{false};
     auto e = app.add_flag(
@@ -63,10 +63,12 @@ int main(int argc, char *argv[]) {
             CPR::print_freq(freq_table);
 
         CPR::Tree cpr_tree = CPR::Tree::new_tree(freq_table);
+        CPR::LengthBook lb = cpr_tree.get_codes();
 
         if (show_coding) {
-            CPR::CodeBook cb = cpr_tree.get_codes();
+            auto cb = CPR::cb_from_lengths(lb);
             CPR::print_codes(cb);
+            return 0;
         }
 
         for (auto file : files) {

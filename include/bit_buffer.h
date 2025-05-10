@@ -10,8 +10,7 @@ namespace CPR {
 
 class BitBuffer {
     public:
-    BitBuffer() : _buffer(), _position(0) {
-    }
+    BitBuffer() : _buffer(), _position(0) {}
 
     //! @brief Writes a single bit to the buffer
     //! @param bit The bit to write

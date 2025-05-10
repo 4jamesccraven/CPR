@@ -1,5 +1,5 @@
 AccessModifierOffset: 0
-AllowShortFunctionsOnASingleLine: None
+AllowShortFunctionsOnASingleLine: InlineOnly
 AllowShortLambdasOnASingleLine: None
 BreakTemplateDeclarations: Yes
 IndentCaseLabels: true
