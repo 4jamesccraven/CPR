@@ -3,13 +3,14 @@
 
 #include "code.h"
 
+#include <cstdint>
 #include <map>
 #include <string>
 
 namespace CPR {
 
-typedef std::map<char, unsigned long long> FreqTable;
-typedef std::pair<char, unsigned long long> Freq;
+typedef std::map<char, uint32_t> FreqTable;
+typedef std::pair<char, uint32_t> Freq;
 typedef std::map<char, Code> CodeBook;
 typedef std::pair<char, Code> Encoding;
 typedef std::map<char, size_t> LengthBook;
@@ -21,7 +22,7 @@ typedef std::map<char, size_t> LengthBook;
  *
  * \warning Does not check for valid file as that should be handled at CLI
  *
- * @return The frequency map, as a std::map<char, unsigned long long>
+ * @return The frequency map, as a std::map<char, uint32_t>
  */
 FreqTable freq_from_file(std::string filename);
 

@@ -28,7 +28,7 @@ std::shared_ptr<TreeNode> TreeNode::get_right() {
     return this->p_right;
 }
 
-unsigned long long TreeNode::get_freq() {
+uint32_t TreeNode::get_freq() {
     return this->_frequency;
 }
 
@@ -40,7 +40,7 @@ char TreeNode::get_char() {
     return this->_character.value();
 }
 
-Tree Tree::new_tree(std::map<char, unsigned long long> freq_map) {
+Tree Tree::new_tree(FreqTable freq_map) {
     typedef std::shared_ptr<TreeNode> NodePtr;
 
     // See below.
@@ -102,11 +102,7 @@ void Tree::_gen_code_no_cannon(
     this->_gen_code_no_cannon(root->get_right(), code.with(1), cb);
 }
 
-LengthBook Tree::get_codes() {
-    // If we've calculated this before, return the result
-    if (this->_lb.has_value())
-        return this->_lb.value();
-
+LengthBook Tree::get_code_lengths() {
     // Generate non-cannonical code lengths
     CodeBook cb;
     std::vector<bool> empty;
@@ -120,37 +116,12 @@ LengthBook Tree::get_codes() {
         }
     );
 
-    this->_lb = std::optional<LengthBook>(sizes);
+    this->_lb = sizes;
 
     return sizes;
 }
 
-// BitBuffer Tree::encode(std::string text) {
-//     BitBuffer temp_buf{};
-//
-//     // Get encoding data
-//     auto cb = this->get_codes();
-//
-//     // Encode the input text in a temporary buffer
-//     for (auto c : text) {
-//         temp_buf.write_bits(cb[c].data());
-//     }
-//
-//     BitBuffer buf{};
-//
-//     auto size = temp_buf.size();
-//
-//     // Encode the byte size into the final buffer
-//     for (int i = 31; i >= 0; i--) {
-//         buf.write_bit((size >> i) & 1);
-//     }
-//
-//     // Add in the encoded data
-//     buf.write_bits(temp_buf.read_bits());
-//
-//     return buf;
-// }
-//
+// HOW: STORE
 // void Tree::write_encode(std::string filename, std::string text) {
 //     std::ofstream out(filename, std::ios::binary);
 //

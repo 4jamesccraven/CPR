@@ -19,6 +19,23 @@
             libgcc
             cmake
 
+            (pkgs.writeShellScriptBin "build" ''
+              if [ ! -d ./build ]; then
+                  mkdir build
+                  cd build
+                  cmake ..
+                  cd ..
+              fi
+
+              cmake --build build --parallel $(nproc)
+            '')
+
+            (pkgs.writeShellScriptBin "clean" ''
+              if [ -d ./build ]; then
+                  rm -fr build
+              fi
+            '')
+
             # For checking the encoded files
             xxd
           ];

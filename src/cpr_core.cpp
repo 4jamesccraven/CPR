@@ -33,7 +33,7 @@ namespace CPR {
 
 FreqTable freq_from_file(std::string filename) {
     std::fstream file{};
-    std::map<char, unsigned long long> map{};
+    FreqTable map{};
     char ch;
 
     file.open(filename);
@@ -151,6 +151,7 @@ CodeBook cb_from_lengths(LengthBook lengths) {
 
         Code code(bits);
         result[ch] = code;
+        code_value++;
     }
 
     return result;

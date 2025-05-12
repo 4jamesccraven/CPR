@@ -4,6 +4,14 @@
 
 namespace CPR {
 
+BitBuffer BitBuffer::from_bits(const std::vector<bool> &bits) {
+    BitBuffer this_{};
+
+    this_.write_bits(bits);
+
+    return this_;
+}
+
 void BitBuffer::write_bit(bool bit) {
     if (this->_position == this->_buffer.size() * 8) {
         this->_buffer.push_back(0);
@@ -30,6 +38,8 @@ bool BitBuffer::read_bit(size_t index) const {
         throw std::out_of_range("Index out of range");
     }
 
+    // At the index / 8 byte, we create a bit mask a the (index % 8)th
+    // position. Cast it to a bit using the comparison operator
     return (this->_buffer[index / 8] & (1 << (7 - (index % 8)))) != 0;
 }
 

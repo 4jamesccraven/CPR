@@ -1,10 +1,8 @@
-#include "bit_buffer.h"
 #include "cpr_core.h"
-#include "tree.h"
+#include "encoder.h"
 
-#include <fstream>
-#include <sstream>
 #include <string>
+#include <vector>
 
 #include <CLI11.hpp>
 
@@ -13,8 +11,8 @@ int main(int argc, char *argv[]) {
     argv = app.ensure_utf8(argv);
 
     std::vector<std::string> files;
-    app.add_option("-f,--files", files, "The file(s) to compress/decompress")
-        ->option_text("FILE")
+    app.add_option("files", files, "The file(s) to compress/decompress")
+        ->option_text("FILES")
         ->required(true)
         ->check(CLI::ExistingFile);
 
@@ -53,57 +51,27 @@ int main(int argc, char *argv[]) {
 
     if (encode) {
 
-        CPR::FreqTable freq_table;
-        for (auto file : files) {
-            CPR::FreqTable other = CPR::freq_from_file(file);
-            CPR::merge_freq(freq_table, other);
-        }
+        CPR::Encoder encoder(files);
 
-        if (show_table)
-            CPR::print_freq(freq_table);
+        bool action_to_do = print || show_table || show_table;
 
-        CPR::Tree cpr_tree = CPR::Tree::new_tree(freq_table);
-        CPR::LengthBook lb = cpr_tree.get_codes();
-
-        if (show_coding) {
-            auto cb = CPR::cb_from_lengths(lb);
-            CPR::print_codes(cb);
+        if (!action_to_do) {
+            std::cerr << "Nothing to do" << std::endl;
             return 0;
         }
 
+        if (show_table) {
+            CPR::print_freq(encoder.get_frequency());
+        }
+
+        if (show_coding) {
+            CPR::print_codes(encoder.get_codes());
+        }
+
         for (auto file : files) {
-            if (print)
-                std::cout << file << ':' << std::endl;
+            if (print) {
 
-            std::ifstream file_handle(file);
-
-            if (!file_handle)
-                throw std::runtime_error("No such file");
-
-            std::stringstream buf;
-
-            buf << file_handle.rdbuf();
-
-            CPR::BitBuffer bits = cpr_tree.encode(buf.str());
-
-            if (print)
-                std::cout << bits << std::endl;
-
-            if (!print || !out_file.empty()) {
-                if (!out_file.empty()) {
-                    cpr_tree.write_encode(out_file, buf.str());
-                } else {
-                    std::string filename;
-                    auto dot = file.find_last_of('.');
-
-                    if (dot != std::string::npos) {
-                        filename = file.substr(0, dot) + ".cprx";
-                    } else {
-                        filename = file + ".cprx";
-                    }
-
-                    cpr_tree.write_encode(filename, buf.str());
-                }
+            } else {
             }
         }
 

@@ -1,12 +1,11 @@
 #ifndef CPR_TREE
 #define CPR_TREE
 
-#include "bit_buffer.h"
 #include "cpr_core.h"
 
+#include <cstdint>
 #include <memory>
 #include <optional>
-#include <string>
 
 namespace CPR {
 
@@ -15,7 +14,7 @@ class TreeNode {
     /// @brief Constructor for existing char
     /// @param char_val The character to store
     /// @param freq Its frequency
-    TreeNode(char char_val, unsigned long long freq)
+    TreeNode(char char_val, uint32_t freq)
         : _character(std::optional<char>{char_val}), _frequency(freq),
           p_left(nullptr), p_right(nullptr) {}
 
@@ -23,9 +22,9 @@ class TreeNode {
     /// @param val The optional char value
     /// @param freq Its frequency
     /* clang-format off */
-    TreeNode(std::optional<char> val, unsigned long long freq)
+    TreeNode(std::optional<char> val, uint32_t freq)
         : _character(val), _frequency(freq),
-          p_left(nullptr), p_right(nullptr) { }
+          p_left(nullptr), p_right(nullptr) {}
     /* clang-format on */
 
     /// @brief Setter for the left child
@@ -39,7 +38,7 @@ class TreeNode {
     std::shared_ptr<TreeNode> get_right();
 
     /// @brief Getter for the frequency
-    unsigned long long get_freq();
+    uint32_t get_freq();
     /// @brief Getter for the character
     /// \warning Throws an error if char is None
     char get_char();
@@ -47,7 +46,7 @@ class TreeNode {
     protected:
     // data
     std::optional<char> _character;
-    unsigned long long _frequency;
+    uint32_t _frequency;
 
     // node structure
     std::shared_ptr<TreeNode> p_left;
@@ -56,23 +55,17 @@ class TreeNode {
 
 class Tree {
     public:
-    //! @brief Factory Constructor
-    //! @param freq_map A map that models a given char's probability
+    /// @brief Factory Constructor
+    /// @param freq_map A map that models a given char's probability
     static Tree new_tree(FreqTable freq_map);
-    //! @brief Generate the serialisable lengths
-    LengthBook get_codes();
-    // //! @brief Encode the string to a buffer
-    // //! @param text The text to encode
-    // BitBuffer encode(std::string text);
-    // //! @brief Encode the string to a file
-    // //! @param text The text to encode
-    // void write_encode(std::string filename, std::string text);
+    /// @brief Generate the serialisable lengths
+    LengthBook get_code_lengths();
 
     protected:
     std::shared_ptr<TreeNode> p_head;
-    std::optional<LengthBook> _lb;
+    LengthBook _lb;
 
-    Tree(std::shared_ptr<TreeNode> head) : p_head(head), _cb({}) {}
+    Tree(std::shared_ptr<TreeNode> head) : p_head(head), _lb({}) {}
 
     /* clang-format off */
     void _gen_code_no_cannon(std::shared_ptr<TreeNode> root, Code code, CodeBook &cb);
