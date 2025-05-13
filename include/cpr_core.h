@@ -1,6 +1,7 @@
 #ifndef CPR_CORE
 #define CPR_CORE
 
+#include "CLI.h"
 #include "code.h"
 
 #include <cstdint>
@@ -58,6 +59,13 @@ void print_codes(CodeBook cb);
  * @return A CodeBook
  */
 CodeBook cb_from_lengths(LengthBook lengths);
+
+/**
+ * @brief Encode files based on args
+ *
+ * @param args See CLI_t
+ */
+void encode(CLI_t args);
 
 } // namespace CPR
 

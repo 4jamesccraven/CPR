@@ -1,4 +1,5 @@
 #include "cpr_core.h"
+#include "encoder.h"
 
 #include <algorithm>
 #include <cstdint>
@@ -155,6 +156,26 @@ CodeBook cb_from_lengths(LengthBook lengths) {
     }
 
     return result;
+}
+
+void encode(CLI_t args) {
+    CPR::Encoder encoder(args.files);
+
+    if (args.show_frequency) {
+        CPR::print_freq(encoder.get_frequency());
+    }
+
+    if (args.show_encoding) {
+        CPR::print_codes(encoder.get_codes());
+    }
+
+    if (args.print) {
+        std::cout << encoder.encode_files() << std::endl;
+    } else {
+        /* clang-format off */
+        encoder.encode_files(!args.out_file.empty() ? args.out_file : "out.cprx");
+        /* clang-format on */
+    }
 }
 
 } // namespace CPR

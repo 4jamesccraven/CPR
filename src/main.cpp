@@ -5,35 +5,27 @@
 #include <CLI11.hpp>
 #include <string>
 
+void run(CLI_t args, std::string help);
+
 int main(int argc, char *argv[]) {
     CLI::App app{"file compression app", "cpr"};
     CLI_t args;
 
     try {
         args = parse_args(app, argc, argv);
+        run(args, app.help());
     } catch (const CLI::ParseError &e) {
         return app.exit(e);
+    } catch (const std::runtime_error &e) {
+        std::cerr << "CPR error: " << e.what() << std::endl;
+        return 1;
     }
+}
 
+void run(CLI_t args, std::string help) {
     if (args.encode) {
 
-        CPR::Encoder encoder(args.files);
-
-        if (args.show_frequency) {
-            CPR::print_freq(encoder.get_frequency());
-        }
-
-        if (args.show_encoding) {
-            CPR::print_codes(encoder.get_codes());
-        }
-
-        if (args.print) {
-            std::cout << encoder.encode_files() << std::endl;
-        } else {
-            /* clang-format off */
-            encoder.encode_files(!args.out_file.empty() ? args.out_file : "out.cprx");
-            /* clang-format on */
-        }
+        CPR::encode(args);
 
     } else if (args.decode) {
 
@@ -43,6 +35,6 @@ int main(int argc, char *argv[]) {
         std::cerr << "No action specified (expected one of [-d/-e])."
                   << std::endl
                   << std::endl;
-        std::cout << app.help() << std::flush;
+        std::cout << help << std::flush;
     }
 }
