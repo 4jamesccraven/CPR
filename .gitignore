@@ -3,3 +3,4 @@ build
 
 .clangd
 .stignore
+example.txt

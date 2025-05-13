@@ -20,7 +20,11 @@ class BitBuffer {
     void write_bit(bool bit);
     /// @brief Writes multiple bits to the buffer
     /// @param bits Vector of bits
+    /// \warning Does not pad to bytes
     void write_bits(const std::vector<bool> &bits);
+    /// @brief Writes multiple bits, ensuring they are byte aligned
+    /// @param bits Vector of bits
+    void write_bytes(const std::vector<bool> &bits);
 
     /// @brief Read a bit from the buffer
     /// @return The bit
@@ -33,7 +37,7 @@ class BitBuffer {
     size_t size() const;
     /// @brief Get number of bytes in buffer
     size_t byte_size() const;
-    /// @brie Get the underlying contiguous memory of the bits
+    /// @brief Get the underlying contiguous memory of the bits
     std::vector<uint8_t> data() const;
 
     friend std::ostream &operator<<(std::ostream &os, const BitBuffer &other);

@@ -54,7 +54,7 @@ Code::Code(T value) {
     unsigned_t uvalue = static_cast<unsigned_t>(value);
 
     std::vector<bool> bits(num_bits);
-    for (size_t i = 0; 1 < num_bits; i++) {
+    for (size_t i = 0; i < num_bits; i++) {
         bits[i] = (uvalue >> (num_bits - 1 - i)) & 1;
     }
 

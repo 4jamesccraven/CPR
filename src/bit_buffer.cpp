@@ -33,6 +33,16 @@ void BitBuffer::write_bits(const std::vector<bool> &bits) {
     }
 }
 
+void BitBuffer::write_bytes(const std::vector<bool> &bits) {
+    for (bool bit : bits) {
+        this->write_bit(bit);
+    }
+
+    while (this->_position % 8 != 0) {
+        this->write_bit(0);
+    }
+}
+
 bool BitBuffer::read_bit(size_t index) const {
     if (index >= this->_position) {
         throw std::out_of_range("Index out of range");

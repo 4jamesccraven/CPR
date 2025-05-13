@@ -12,6 +12,30 @@
       system:
       let
         pkgs = import nixpkgs { inherit system; };
+        prep-build = (
+          pkgs.writeShellScriptBin "prep-build" ''
+            if [ ! -d ./build ]; then
+                mkdir build
+                cd build
+                cmake ..
+                cd ..
+            fi
+          ''
+        );
+        build = (
+          pkgs.writeShellScriptBin "build" ''
+            ${prep-build}/bin/prep-build
+
+            cmake --build build --parallel $(nproc)
+          ''
+        );
+        clean = (
+          pkgs.writeShellScriptBin "clean" ''
+            if [ -d ./build ]; then
+                rm -fr build
+            fi
+          ''
+        );
       in
       {
         devShells.default = pkgs.mkShell {
@@ -19,22 +43,9 @@
             libgcc
             cmake
 
-            (pkgs.writeShellScriptBin "build" ''
-              if [ ! -d ./build ]; then
-                  mkdir build
-                  cd build
-                  cmake ..
-                  cd ..
-              fi
-
-              cmake --build build --parallel $(nproc)
-            '')
-
-            (pkgs.writeShellScriptBin "clean" ''
-              if [ -d ./build ]; then
-                  rm -fr build
-              fi
-            '')
+            prep-build
+            build
+            clean
 
             # For checking the encoded files
             xxd

@@ -121,20 +121,4 @@ LengthBook Tree::get_code_lengths() {
     return sizes;
 }
 
-// HOW: STORE
-// void Tree::write_encode(std::string filename, std::string text) {
-//     std::ofstream out(filename, std::ios::binary);
-//
-//     if (!out)
-//         throw std::runtime_error("Unable to open file for writing");
-//
-//     BitBuffer buf = this->encode(text);
-//
-//     std::vector<uint8_t> data = buf.data();
-//
-//     out.write(reinterpret_cast<const char *>(data.data()), data.size());
-//
-//     out.close();
-// }
-
 } // namespace CPR
