@@ -91,8 +91,14 @@ BitBuffer Encoder::_make_encode() {
 
     for (auto file : this->_files) {
         // Encode the file's name
+        // Strip out prefix
+        std::string copy = file;
+        auto last_pos = file.find_last_of('/');
+        if (last_pos != std::string::npos)
+            copy = copy.substr(last_pos + 1, std::string::npos);
+
         BitBuffer filename{};
-        for (char c : file) {
+        for (char c : copy) {
             filename.write_bytes(Code(c).data());
         }
         filename.write_bytes(Code('\0').data());
@@ -203,8 +209,16 @@ void Encoder::decode_archive(CLI_t args) {
             std::cout << text;
         }
 
-        if (!args.print)
-            std::cerr << "TODO" << std::endl;
+        if (!args.print) {
+            std::ofstream out(filename);
+
+            if (!out)
+                throw std::runtime_error("unable to write to file");
+
+            out << text;
+
+            out.close();
+        }
     }
 }
 

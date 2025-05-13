@@ -3,6 +3,7 @@
 #include "encoder.h"
 
 #include <CLI11.hpp>
+#include <string>
 
 int main(int argc, char *argv[]) {
     CLI::App app{"file compression app", "cpr"};
@@ -16,15 +17,7 @@ int main(int argc, char *argv[]) {
 
     if (args.encode) {
 
-        bool action_to_do = !args.out_file.empty() || args.print ||
-                            args.show_frequency || args.show_encoding;
-
         CPR::Encoder encoder(args.files);
-
-        if (!action_to_do) {
-            std::cerr << "Nothing to do" << std::endl;
-            return 0;
-        }
 
         if (args.show_frequency) {
             CPR::print_freq(encoder.get_frequency());
