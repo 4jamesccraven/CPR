@@ -10,6 +10,23 @@
 #include <string>
 #include <vector>
 
+uint32_t read_u32(std::ifstream &f) {
+    uint8_t buf[4];
+
+    f.read(reinterpret_cast<char *>(buf), 4);
+
+    // Shift each byte to occupy its significance place, and combine
+    // using bitwise or
+    return (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
+}
+
+char read_char(std::ifstream &f) {
+    char byte;
+    f.read(&byte, 1);
+
+    return byte;
+}
+
 namespace CPR {
 
 Encoder::Encoder(const std::vector<std::string> &files) {
@@ -54,14 +71,14 @@ BitBuffer Encoder::encode_body(const std::string &text) {
     BitBuffer buf{};
 
     for (char c : text) {
-        temp_buf.write_bytes(this->_cb[c].data());
+        temp_buf.write_bits(this->_cb[c].data());
     }
 
     Code data_length = Code(temp_buf.size());
 
     // Dump actual encoding to final buffer
-    buf.write_bytes(data_length.data());
-    buf.write_bytes(temp_buf.read_bits());
+    buf.write_bits(data_length.data());
+    buf.write_bits(temp_buf.read_bits());
 
     return buf;
 }
@@ -105,7 +122,7 @@ void Encoder::encode_files(std::string out_file) {
     std::ofstream out(out_file, std::ios::binary);
 
     if (!out)
-        throw std::runtime_error("Unable to open archive destination");
+        throw std::runtime_error("unable to open archive destination");
 
     auto bits = this->_make_encode();
 
@@ -117,20 +134,78 @@ void Encoder::encode_files(std::string out_file) {
     out.close();
 }
 
-// HOW: STORE
-// void Tree::write_encode(std::string filename, std::string text) {
-//     std::ofstream out(filename, std::ios::binary);
-//
-//     if (!out)
-//         throw std::runtime_error("Unable to open file for writing");
-//
-//     BitBuffer buf = this->encode(text);
-//
-//     std::vector<uint8_t> data = buf.data();
-//
-//     out.write(reinterpret_cast<const char *>(data.data()), data.size());
-//
-//     out.close();
-// }
+void Encoder::decode_archive(CLI_t args) {
+    if (args.files.size() > 1)
+        throw std::runtime_error("too many files");
+
+    auto file = args.files[0];
+
+    std::ifstream file_handle(file, std::ios::binary);
+
+    if (!file_handle)
+        throw std::runtime_error("unable to open archive");
+
+    // Reconstruct the lengths
+    LengthBook lb;
+    uint32_t encoding_count = read_u32(file_handle);
+
+    for (auto i = 0; i < encoding_count; i++) {
+        char c = read_char(file_handle);
+        uint32_t length = read_u32(file_handle);
+
+        lb[c] = length;
+    }
+
+    // Recreate the true encoding
+    auto cb = cb_from_lengths(lb);
+    auto tree = Tree::from_codes(cb);
+
+    if (args.show_encoding)
+        print_codes(cb);
+
+    // While there are characters to read
+    char c;
+    while (file_handle.get(c)) {
+        file_handle.seekg(-1, std::ios_base::cur);
+
+        // Get the null-terminated file name
+        std::string filename;
+        while (file_handle.get(c) && c != '\0') {
+            filename += c;
+        }
+
+        if (args.print)
+            std::cout << filename << ':' << std::endl;
+
+        // Retrieve the raw encoded data for the file
+        uint32_t bit_count = read_u32(file_handle);
+        std::vector<bool> bits;
+        bits.reserve(bit_count);
+
+        // While there are bits left
+        while (bits.size() < bit_count) {
+            // Read a byte
+            char byte;
+            if (!file_handle.read(&byte, 1))
+                throw std::runtime_error("unexpected EOF");
+
+            // Push bits to our buffer until we use the byte or hit our limit
+            uint8_t b = static_cast<uint8_t>(byte);
+            for (int i = 7; i >= 0 && bits.size() < bit_count; i--) {
+                bits.push_back((b >> i) & 1);
+            }
+        }
+
+        // Decode the bits
+        auto text = tree.decode(bits);
+
+        if (args.print) {
+            std::cout << text;
+        }
+
+        if (!args.print)
+            std::cerr << "TODO" << std::endl;
+    }
+}
 
 }; // namespace CPR

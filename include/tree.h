@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <memory>
 #include <optional>
+#include <vector>
 
 namespace CPR {
 
@@ -37,6 +38,9 @@ class TreeNode {
     /// @brief Getter for the right child
     std::shared_ptr<TreeNode> get_right();
 
+    /// @brief Setter for the char
+    void set_char(char c);
+
     /// @brief Getter for the frequency
     uint32_t get_freq();
     /// @brief Getter for the character
@@ -55,11 +59,18 @@ class TreeNode {
 
 class Tree {
     public:
-    /// @brief Factory Constructor
+    /// @brief Factory constructor
     /// @param freq_map A map that models a given char's probability
     static Tree new_tree(FreqTable freq_map);
+    /// @brief Factory constructor for pre-existing codes
+    /// @param codes Map of <char, Code>
+    static Tree from_codes(CodeBook codes);
     /// @brief Generate the serialisable lengths
     LengthBook get_code_lengths();
+
+    /// @brief Decode bits into a character
+    /// @param bits The bits to decode
+    std::string decode(const std::vector<bool> &bits);
 
     protected:
     std::shared_ptr<TreeNode> p_head;

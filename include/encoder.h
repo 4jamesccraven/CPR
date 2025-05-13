@@ -1,6 +1,7 @@
 #ifndef CPR_ENCODER
 #define CPR_ENCODER
 
+#include "CLI.h"
 #include "bit_buffer.h"
 #include "cpr_core.h"
 
@@ -23,9 +24,14 @@ class Encoder {
     /// @param text The string to encode
     BitBuffer encode_body(const std::string &text);
     /// @brief Encode files to bits
-    /// @brief out_file Optional file to output to
+    /// @param out_file Optional file to output to
     BitBuffer encode_files();
     void encode_files(std::string out_file);
+    /// @brief Decode an archive
+    /// @param file Path to the archive
+    /// @param extract Whether or not the contents should be fully extracted to
+    /// the current working directory
+    static void decode_archive(CLI_t args);
 
     protected:
     FreqTable _fq;

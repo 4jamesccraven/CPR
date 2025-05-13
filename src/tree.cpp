@@ -5,6 +5,7 @@
 #include <iterator>
 #include <map>
 #include <memory>
+#include <optional>
 #include <queue>
 #include <stdexcept>
 #include <sys/types.h>
@@ -30,6 +31,10 @@ std::shared_ptr<TreeNode> TreeNode::get_right() {
 
 uint32_t TreeNode::get_freq() {
     return this->_frequency;
+}
+
+void TreeNode::set_char(char c) {
+    this->_character = std::make_optional(c);
 }
 
 char TreeNode::get_char() {
@@ -82,6 +87,31 @@ Tree Tree::new_tree(FreqTable freq_map) {
     return Tree(queue.top());
 }
 
+Tree Tree::from_codes(CodeBook codes) {
+    auto root = std::make_shared<TreeNode>(TreeNode({}, 0));
+
+    for (const auto &[ch, code] : codes) {
+        TreeNode *current = root.get();
+        for (bool bit : code.data()) {
+            if (bit == 1) {
+                if (!current->get_right())
+                    current->set_right(
+                        std::make_shared<TreeNode>(TreeNode({}, 0))
+                    );
+                current = current->get_right().get();
+            } else {
+                if (!current->get_left())
+                    current->set_left(std::make_shared<TreeNode>(TreeNode({}, 0)
+                    ));
+                current = current->get_left().get();
+            }
+        }
+        current->set_char(ch);
+    }
+
+    return Tree(root);
+}
+
 void Tree::_gen_code_no_cannon(
     std::shared_ptr<TreeNode> root, Code code, CodeBook &cb
 ) {
@@ -119,6 +149,24 @@ LengthBook Tree::get_code_lengths() {
     this->_lb = sizes;
 
     return sizes;
+}
+
+std::string Tree::decode(const std::vector<bool> &bits) {
+    std::string out;
+    TreeNode *current = this->p_head.get();
+
+    for (bool bit : bits) {
+        current = bit ? current->get_right().get() : current->get_left().get();
+        if (!current)
+            throw std::runtime_error("invalid encoding");
+
+        if (!current->get_left() && !current->get_right()) {
+            out += current->get_char();
+            current = this->p_head.get();
+        }
+    }
+
+    return out;
 }
 
 } // namespace CPR

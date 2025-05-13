@@ -14,10 +14,6 @@ int main(int argc, char *argv[]) {
         return app.exit(e);
     }
 
-    for (auto file : args.files) {
-        std::cerr << file << std::endl;
-    }
-
     if (args.encode) {
 
         bool action_to_do = !args.out_file.empty() || args.print ||
@@ -47,6 +43,8 @@ int main(int argc, char *argv[]) {
         }
 
     } else if (args.decode) {
+
+        CPR::Encoder::decode_archive(args);
 
     } else {
         std::cerr << "No action specified (expected one of [-d/-e])."

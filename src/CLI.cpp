@@ -43,8 +43,8 @@ CLI_t parse_args(CLI::App &app, int argc, char *argv[]) {
         "Decompress the file(s)"
     );
 
-    app.add_flag(
-        "-t,--print-table",
+    auto f = app.add_flag(
+        "-t,--print-frequency",
         args.show_frequency,
         "Print the frequency table"
     );
@@ -64,6 +64,7 @@ CLI_t parse_args(CLI::App &app, int argc, char *argv[]) {
 
     e->excludes(d);
     d->excludes(e);
+    d->excludes(f); // It is not possible to determine this from an encoded file
 
     app.parse(argc, argv);
 

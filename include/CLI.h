@@ -7,10 +7,14 @@
 #include <CLI11.hpp>
 
 struct CLI_t {
+    // Positional
     std::vector<std::string> files;
+    // Pseudo positional
     std::string out_file;
+    // Subcommand
     bool encode;
     bool decode;
+    // Flags
     bool show_frequency;
     bool show_encoding;
     bool print;
