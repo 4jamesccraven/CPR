@@ -83,6 +83,9 @@ std::ostream &operator<<(std::ostream &os, const BitBuffer &other) {
         if (i != 0 && (i % 8 == 0))
             os << " ";
 
+        if (i != 0 && (i % 48 == 0))
+            os << std::endl;
+
         os << (bit ? '1' : '0');
 
         i++;

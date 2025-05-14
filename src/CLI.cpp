@@ -11,6 +11,7 @@ CLI_t parse_args(CLI::App &app, int argc, char *argv[]) {
     args.decode = false;
     args.show_frequency = false;
     args.show_encoding = false;
+    args.no_output = false;
     args.print = false;
 
     /* clang-format off */
@@ -59,6 +60,12 @@ CLI_t parse_args(CLI::App &app, int argc, char *argv[]) {
         "-p,--print",
         args.print,
         "Print the output of (de)compression"
+    );
+
+    auto O = app.add_flag(
+        "-O,--no-extract",
+        args.no_output,
+        "Do not reconstruct files, even when not using -p"
     );
     /* clang-format on */
 

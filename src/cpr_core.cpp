@@ -69,6 +69,10 @@ void print_freq(FreqTable table) {
     });
 
     std::cout << "Char | " << std::setw(width) << "Count" << std::endl;
+    std::cout << "-----+-" << std::setw(width) << std::setfill('-') << '-'
+              << std::endl;
+
+    std::cout << std::setfill(' ');
 
     std::for_each(pairs.crbegin(), pairs.crend(), [=](const auto pair) {
         std::string key;
@@ -91,6 +95,7 @@ void print_freq(FreqTable table) {
         std::cout << std::left << std::setw(4) << key << " | " << std::right
                   << std::setw(width) << pair.second << std::endl;
     });
+    std::cout << std::endl;
 }
 
 void merge_freq(FreqTable &table, const FreqTable &other) {
@@ -100,9 +105,20 @@ void merge_freq(FreqTable &table, const FreqTable &other) {
 }
 
 void print_codes(CodeBook cb) {
-    std::cout << "Char | Code" << std::endl;
+    std::vector<Encoding> cds;
 
     for (auto pair : cb) {
+        cds.push_back(pair);
+    }
+
+    std::sort(cds.begin(), cds.end(), [](const auto &a, const auto &b) {
+        return a.second.size() < b.second.size();
+    });
+
+    std::cout << "Char | Code" << std::endl;
+    std::cout << "-----+-----" << std::endl;
+
+    for (auto pair : cds) {
         std::string key;
 
         switch (pair.first) {
@@ -119,8 +135,11 @@ void print_codes(CodeBook cb) {
                 key = pair.first;
                 break;
         }
-        std::cout << std::setw(4) << key << " | " << pair.second << std::endl;
+        std::cout << std::left << std::setw(4) << key << " | " << pair.second
+                  << std::endl;
     }
+
+    std::cout << std::endl;
 }
 
 CodeBook cb_from_lengths(LengthBook lengths) {
@@ -171,7 +190,7 @@ void encode(CLI_t args) {
 
     if (args.print) {
         std::cout << encoder.encode_files() << std::endl;
-    } else {
+    } else if (!args.no_output) {
         /* clang-format off */
         encoder.encode_files(!args.out_file.empty() ? args.out_file : "out.cprx");
         /* clang-format on */

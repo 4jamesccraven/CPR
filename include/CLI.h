@@ -17,6 +17,7 @@ struct CLI_t {
     // Flags
     bool show_frequency;
     bool show_encoding;
+    bool no_output;
     bool print;
 };
 

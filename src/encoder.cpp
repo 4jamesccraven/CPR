@@ -4,11 +4,14 @@
 #include "tree.h"
 
 #include <algorithm>
+#include <array>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+const std::array<char, 5> MAGIC = {'C', 'P', 'R', 'X', '1'};
 
 uint32_t read_u32(std::ifstream &f) {
     uint8_t buf[4];
@@ -46,6 +49,11 @@ Encoder::Encoder(const std::vector<std::string> &files) {
 
 BitBuffer Encoder::encode_header() const {
     BitBuffer buf{};
+
+    // Encode magic bytes to mark the file as cprx format
+    for (auto c : MAGIC) {
+        buf.write_bytes(Code(c).data());
+    }
 
     // Encode number of k,v pairs in the LengthBook
     Code table_size = Code(this->_cb.size());
@@ -151,6 +159,12 @@ void Encoder::decode_archive(CLI_t args) {
     if (!file_handle)
         throw std::runtime_error("unable to open archive");
 
+    // Check for the magic bytes
+    char magic[5];
+    file_handle.read(magic, 5);
+    if (std::string(magic, 5) != "CPRX1")
+        throw std::runtime_error("invalid archive format");
+
     // Reconstruct the lengths
     LengthBook lb;
     uint32_t encoding_count = read_u32(file_handle);
@@ -181,7 +195,7 @@ void Encoder::decode_archive(CLI_t args) {
         }
 
         if (args.print)
-            std::cout << filename << ':' << std::endl;
+            std::cout << filename << ':' << std::endl << std::endl;
 
         // Retrieve the raw encoded data for the file
         uint32_t bit_count = read_u32(file_handle);
@@ -206,10 +220,10 @@ void Encoder::decode_archive(CLI_t args) {
         auto text = tree.decode(bits);
 
         if (args.print) {
-            std::cout << text;
+            std::cout << text << std::endl;
         }
 
-        if (!args.print) {
+        if (!args.print && !args.no_output) {
             std::ofstream out(filename);
 
             if (!out)

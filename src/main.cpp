@@ -8,7 +8,7 @@
 void run(CLI_t args, std::string help);
 
 int main(int argc, char *argv[]) {
-    CLI::App app{"file compression app", "cpr"};
+    CLI::App app{"A compression format based on huffman coding", "cpr"};
     CLI_t args;
 
     try {
