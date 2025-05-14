@@ -51,6 +51,16 @@ OPTIONS:
 
 `cpr FILES -ctCp`
 
+## Building
+
+```
+git clone git@github.com:4jamesccraven/CPR.git
+mkdir build
+cd build
+cmake ..
+make
+```
+
 ## Motivation & Limitations
 
 As with many of my programs, this isn't really designed for practical use. This
