@@ -7,35 +7,16 @@
   };
 
   outputs =
-    { flake-utils, nixpkgs, ... }:
+    {
+      self,
+      flake-utils,
+      nixpkgs,
+      ...
+    }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
         pkgs = import nixpkgs { inherit system; };
-        prep-build = (
-          pkgs.writeShellScriptBin "prep-build" ''
-            if [ ! -d ./build ]; then
-                mkdir build
-                cd build
-                cmake ..
-                cd ..
-            fi
-          ''
-        );
-        build = (
-          pkgs.writeShellScriptBin "build" ''
-            ${prep-build}/bin/prep-build
-
-            cmake --build build --parallel $(nproc)
-          ''
-        );
-        clean = (
-          pkgs.writeShellScriptBin "clean" ''
-            if [ -d ./build ]; then
-                rm -fr build
-            fi
-          ''
-        );
       in
       {
         devShells.default = pkgs.mkShell {
@@ -43,14 +24,33 @@
             libgcc
             cmake
 
-            prep-build
-            build
-            clean
+            just
 
             # For checking the encoded files
             xxd
           ];
         };
+
+        packages.default = self.packages.${system}.cpr;
+        packages.cpr =
+          with pkgs;
+          stdenv.mkDerivation {
+            name = "cpr-0.1.0";
+            src = ./.;
+
+            nativeBuildInputs = [
+              cli11
+              cmake
+            ];
+
+            installPhase = ''
+              mkdir -p $out/bin
+              cp ./cpr $out/bin
+
+              chmod +x $out/bin/cpr
+            '';
+            enableParallelBuilding = true;
+          };
       }
     );
 }
