@@ -52,17 +52,22 @@ OPTIONS:
 `cpr FILES -ctCp`
 
 ## Building
-
+First clone the repo, and enter the project directory
+```bash
+git clone https://github.com/4jamesccraven/CPR.git
+cd CPR
 ```
-git clone git@github.com:4jamesccraven/CPR.git
-mkdir build
-cd build
-cmake ..
-make
+If you have just installed, you can simply run `just build`; otherwise do the following:
+```bash
+cmake -S . -B build
+# parallel flag optional, speeds up build time.
+cmake --build build --parallel $(nproc)
 ```
+If you have nix with flakes enabled, you can play around with it in a shell like by running
+`nix shell github:4jamesccraven/CPR`
 
 ## Motivation & Limitations
 
-As with many of my programs, this isn't really designed for practical use. This
-program was something my dad suggested I make as a joke. I wanted to make it
-just to see if I could.
+This is mostly a toy example of Huffman Encoding, and it is not ideal for general use.
+Notably, The encoding process (unintentionally) un-nests all sub directories. I may fix
+it eventually, I may not. `¯\_(ツ)_/¯`
