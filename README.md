@@ -63,7 +63,7 @@ cmake -S . -B build
 # parallel flag optional, speeds up build time.
 cmake --build build --parallel $(nproc)
 ```
-If you have nix with flakes enabled, you can play around with it in a shell like by running
+If you have nix with flakes enabled, you can play around with it in a shell by running
 `nix shell github:4jamesccraven/CPR`
 
 ## Motivation & Limitations
