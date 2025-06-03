@@ -1,6 +1,6 @@
 #include "CLI.h"
 
-#include <CLI11.hpp>
+#include <CLI/CLI.hpp>
 
 CLI_t parse_args(CLI::App &app, int argc, char *argv[]) {
     argv = app.ensure_utf8(argv);

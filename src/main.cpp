@@ -2,7 +2,7 @@
 #include "cpr_core.h"
 #include "encoder.h"
 
-#include <CLI11.hpp>
+#include <CLI/CLI.hpp>
 #include <string>
 
 void run(CLI_t args, std::string help);

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <CLI11.hpp>
+#include <CLI/CLI.hpp>
 
 struct CLI_t {
     // Positional
